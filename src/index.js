@@ -1,4 +1,3 @@
-const bodyParser = require('body-parser');
 const express = require('express')
 
 const app = express();
@@ -19,7 +18,7 @@ const SetupAndStartServer = () => {
     app.use('/api',apiRoutes);
     app.listen(PORT, () =>{
         console.log(`Server start on PORT ${PORT}`);
-        if(process.env.DB_SYNC) {
+        if(process.env.DB_SYNC) { //it will sync with latest updated model folder
             db.sequelize.sync({alter:true});
         }
     });
