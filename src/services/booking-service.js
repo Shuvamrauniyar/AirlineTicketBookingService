@@ -27,6 +27,8 @@ class BookingService {
             const totalSeats = flightData.totalSeats - data.noOfSeats;
             // console.log('totalseats')
             await axios.patch(getFlightRequestURL,{totalSeats}); //updating the seats left in the flight after booking
+            const finalBooking = await this.bookingRepository.update(createResponse.id,{status : 'BOOKED'});
+            return finalBooking;
         }
            //0:58:00
         // console.log(flightData);
@@ -35,6 +37,10 @@ class BookingService {
             console.log('error in service layer while creating booking')
             throw new ServiceError();
         }
+    }
+
+    async update(id, data){
+
     }
 }
 module.exports = BookingService;

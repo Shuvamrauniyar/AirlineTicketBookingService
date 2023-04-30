@@ -22,5 +22,26 @@ class BookingRepository {
             );
         }
     }
+    async update(bookingId,data)
+    {
+        try {
+            console.log('updating  status from repo layer')
+            // const bookingData = await Booking.update(data,{
+            //     where:{
+            //         id: bookingId
+            //     }
+            // }); //here the update was returning 1 ig it means successfully updated but it was good response to the frontend,so used below method
+            const bookingData = await Booking.findByPk(bookingId);
+            if(data)
+            {
+               bookingData.status = data.status;
+            }
+            await bookingData.save();
+            return bookingData;
+        } catch (error) {
+            console.log('error in repo layer');
+           throw error;
+        }
+    }
 }
 module.exports = BookingRepository;
