@@ -24,7 +24,7 @@ class BookingService {
             // console.log('true');
             data.totalCost  = flightData.price * data.noOfSeats;
               createResponse = await this.bookingRepository.create(data);
-            const totalSeats = flightData.totalSeats - data.noOfSeats;
+            const totalSeats = flightData.totalSeats - data.noOfSeats; //there may be concurrency issue 
             // console.log('totalseats')
             await axios.patch(getFlightRequestURL,{totalSeats}); //updating the seats left in the flight after booking
             const finalBooking = await this.bookingRepository.update(createResponse.id,{status : 'BOOKED'});
@@ -39,7 +39,30 @@ class BookingService {
         }
     }
 
-    async update(id, data){
+    async cancelBooking(bookingId){
+        try {
+            //fetching booking record
+            const booking = await this.bookingRepository.getBookingRecord(bookingId); 
+
+            //fetching corresponding flights details with the help of flightId
+            let getFlightRequestURL = `${FLIGHT_SERVICE_PATH}/api/v1/flights/${booking.flightId}`;
+            const response = await axios.get(getFlightRequestURL);
+            const flightData  = response.data.data; 
+
+            console.log('flightdata are', flightData);
+
+            //updating back the totalseats in the respective flight after cancellation
+            const totalSeats = flightData.totalSeats + booking.noOfSeats;
+            await axios.patch(getFlightRequestURL,{totalSeats});
+
+            //updating the status the booking as cancelled
+            const cancelResult =  await this.bookingRepository.update(bookingId,{status : 'CANCELLED'});
+            return cancelResult;
+
+        } catch (error) {
+            console.log('error while cancelling booking in service layer');
+            throw error;
+        }
 
     }
 }

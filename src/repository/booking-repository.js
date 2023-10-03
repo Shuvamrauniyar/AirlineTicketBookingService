@@ -43,5 +43,17 @@ class BookingRepository {
            throw error;
         }
     }
+    async getBookingRecord(bookingId){
+        try {
+            const bookingDetails = await Booking.findOne({
+                where: {id: bookingId},
+                attributes: ['flightId', 'noOfSeats']
+            });
+            return bookingDetails;
+        } catch (error) {
+            console.log('error while fetching booking details in booking-repo layer');
+            throw error;
+        }
+    }
 }
 module.exports = BookingRepository;
